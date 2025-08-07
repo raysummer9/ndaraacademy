@@ -1,4 +1,4 @@
-name: Deploy to Live Server (FTP)
+name: Deploy to Live Server (FTP - Safe Mode)
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Deploy to FTP
+    - name: Deploy to FTP (Safe Mode)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_SERVER }}
