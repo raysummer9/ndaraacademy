@@ -1,0 +1,69 @@
+# Moodle FTP Deployment Configuration
+# Copy this file to deploy-ftp.config and update with your FTP details
+
+# FTP Server Configuration
+FTP_SERVER=your-ftp-server.com
+FTP_USERNAME=your-ftp-username
+FTP_PASSWORD=your-ftp-password
+FTP_SERVER_DIR=/public_html/learn
+
+# Optional: Use SFTP instead of FTP
+# USE_SFTP=true
+# SSH_KEY_PATH=~/.ssh/id_rsa
+
+# Site URL (for notifications)
+SITE_URL=https://your-domain.com
+
+# Deployment Options
+# Set to true to enable dry-run mode (shows what would be done without executing)
+DRY_RUN=false
+
+# FTP Connection Options
+FTP_TIMEOUT=30
+FTP_RETRIES=3
+
+# Example configurations for different environments:
+
+# Development Server
+# FTP_SERVER=dev.your-domain.com
+# FTP_USERNAME=devuser
+# FTP_PASSWORD=devpass
+# FTP_SERVER_DIR=/public_html/dev/moodle
+
+# Staging Server
+# FTP_SERVER=staging.your-domain.com
+# FTP_USERNAME=staginguser
+# FTP_PASSWORD=stagingpass
+# FTP_SERVER_DIR=/public_html/staging/moodle
+
+# Production Server
+# FTP_SERVER=prod.your-domain.com
+# FTP_USERNAME=produser
+# FTP_PASSWORD=prodpass
+# FTP_SERVER_DIR=/public_html/prod/moodle
+
+# Common hosting providers examples:
+
+# cPanel Hosting
+# FTP_SERVER=your-domain.com
+# FTP_USERNAME=your-cpanel-username
+# FTP_PASSWORD=your-cpanel-password
+# FTP_SERVER_DIR=/public_html/moodle
+
+# GoDaddy Hosting
+# FTP_SERVER=your-domain.com
+# FTP_USERNAME=your-godaddy-username
+# FTP_PASSWORD=your-godaddy-password
+# FTP_SERVER_DIR=/moodle
+
+# Bluehost Hosting
+# FTP_SERVER=your-domain.com
+# FTP_USERNAME=your-bluehost-username
+# FTP_PASSWORD=your-bluehost-password
+# FTP_SERVER_DIR=/public_html/moodle
+
+# HostGator Hosting
+# FTP_SERVER=your-domain.com
+# FTP_USERNAME=your-hostgator-username
+# FTP_PASSWORD=your-hostgator-password
+# FTP_SERVER_DIR=/public_html/moodle 

@@ -1,0 +1,94 @@
+name: Deploy to Live Server
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup SSH
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+        
+    - name: Add server to known hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+        
+    - name: Deploy to server
+      run: |
+        # Create deployment script
+        cat > deploy.sh << 'EOF'
+        #!/bin/bash
+        set -e
+        
+        # Variables
+        SERVER_HOST="${{ secrets.SERVER_HOST }}"
+        SERVER_USER="${{ secrets.SERVER_USER }}"
+        SERVER_PATH="${{ secrets.SERVER_PATH }}"
+        BACKUP_PATH="${{ secrets.BACKUP_PATH }}"
+        
+        echo "🚀 Starting deployment..."
+        
+        # Create backup directory if it doesn't exist
+        ssh $SERVER_USER@$SERVER_HOST "mkdir -p $BACKUP_PATH"
+        
+        # Create backup of current version
+        echo "📦 Creating backup..."
+        ssh $SERVER_USER@$SERVER_HOST "if [ -d '$SERVER_PATH' ]; then tar -czf $BACKUP_PATH/backup-$(date +%Y%m%d-%H%M%S).tar.gz -C $SERVER_PATH .; fi"
+        
+        # Create server directory if it doesn't exist
+        ssh $SERVER_USER@$SERVER_HOST "mkdir -p $SERVER_PATH"
+        
+        # Sync files to server (excluding sensitive files)
+        echo "📤 Syncing files to server..."
+        rsync -avz --delete \
+          --exclude='.git/' \
+          --exclude='.github/' \
+          --exclude='config.php' \
+          --exclude='moodledata/' \
+          --exclude='*.log' \
+          --exclude='*.sql' \
+          --exclude='*.sqlite' \
+          --exclude='temp/' \
+          --exclude='cache/' \
+          --exclude='vendor/' \
+          --exclude='node_modules/' \
+          --exclude='.DS_Store' \
+          --exclude='*.tmp' \
+          --exclude='*.bak' \
+          ./ $SERVER_USER@$SERVER_HOST:$SERVER_PATH/
+        
+        # Set proper permissions
+        echo "🔐 Setting permissions..."
+        ssh $SERVER_USER@$SERVER_HOST "chmod -R 755 $SERVER_PATH"
+        ssh $SERVER_USER@$SERVER_HOST "find $SERVER_PATH -type f -exec chmod 644 {} \;"
+        ssh $SERVER_USER@$SERVER_HOST "find $SERVER_PATH -type d -exec chmod 755 {} \;"
+        
+        # Clear cache if config.php exists
+        echo "🧹 Clearing cache..."
+        ssh $SERVER_USER@$SERVER_HOST "if [ -f '$SERVER_PATH/config.php' ]; then cd $SERVER_PATH && php admin/cli/purge_caches.php; fi"
+        
+        echo "✅ Deployment completed successfully!"
+        echo "🌐 Your site should be available at: ${{ secrets.SITE_URL }}"
+        
+        EOF
+        
+        chmod +x deploy.sh
+        ./deploy.sh
+        
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ ${{ job.status }} == 'success' ]; then
+          echo "🎉 Deployment successful!"
+        else
+          echo "❌ Deployment failed!"
+        fi 
