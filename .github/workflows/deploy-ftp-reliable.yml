@@ -1,4 +1,4 @@
-name: Deploy to Live Server (FTP)
+name: Deploy to Live Server (FTP - Reliable)
 
 on:
   push:
@@ -8,12 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Deploy to FTP
+    - name: Deploy to FTP (Reliable Mode)
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_SERVER }}
@@ -21,8 +22,9 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/learn/
         dangerous-clean-slate: false
-        timeout: 600000
-        max-retries: 3
+        timeout: 900000
+        max-retries: 5
+        log-level: verbose
         exclude: |
           **/.git*
           **/.git*/**
@@ -44,4 +46,16 @@ jobs:
           **/scripts/**
           **/custom-configs/**
           **/user-uploads/**
-          **/local-modifications/** 
+          **/local-modifications/**
+          **/lib/phpspreadsheet/**
+          **/lib/tcpdf/**
+          **/lib/yui/**
+          **/lib/pear/**
+          **/lib/phpmailer/**
+          **/lib/plist/**
+          **/lib/ralouphie/**
+          **/lib/userkey/**
+          **/lib/xmldb/**
+          **/lib/xhtml.xsl**
+          **/lib/searchlib.php**
+          **/lib/requirejs.php** 
