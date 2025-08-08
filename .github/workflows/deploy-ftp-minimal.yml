@@ -1,0 +1,104 @@
+name: Deploy to Live Server (FTP - Minimal)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Deploy to FTP (Minimal Files)
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /public_html/learn/
+        dangerous-clean-slate: false
+        timeout: 300000
+        max-retries: 3
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.github/**
+          **/config.php
+          **/moodledata/**
+          **/*.log
+          **/*.sql
+          **/*.sqlite
+          **/temp/**
+          **/cache/**
+          **/vendor/**
+          **/.DS_Store
+          **/*.tmp
+          **/*.bak
+          **/deploy.config*
+          **/DEPLOYMENT.md
+          **/scripts/**
+          **/custom-configs/**
+          **/user-uploads/**
+          **/local-modifications/**
+          **/lib/**
+          **/admin/**
+          **/auth/**
+          **/backup/**
+          **/badges/**
+          **/blocks/**
+          **/blog/**
+          **/calendar/**
+          **/cohort/**
+          **/comment/**
+          **/communication/**
+          **/competency/**
+          **/completion/**
+          **/contentbank/**
+          **/course/**
+          **/customfield/**
+          **/dataformat/**
+          **/enrol/**
+          **/error/**
+          **/favourites/**
+          **/files/**
+          **/filter/**
+          **/grade/**
+          **/group/**
+          **/h5p/**
+          **/iplookup/**
+          **/lang/**
+          **/local/**
+          **/media/**
+          **/message/**
+          **/mnet/**
+          **/mod/**
+          **/moodlenet/**
+          **/my/**
+          **/notes/**
+          **/payment/**
+          **/pix/**
+          **/plagiarism/**
+          **/portfolio/**
+          **/privacy/**
+          **/question/**
+          **/rating/**
+          **/report/**
+          **/reportbuilder/**
+          **/repository/**
+          **/rss/**
+          **/search/**
+          **/sms/**
+          **/tag/**
+          **/user/**
+          **/webservice/**
+          **/theme/**
+          **/theme/ndara/lang/**
+          **/theme/ndara/lang/en/**
+          **/theme/ndara/lang/en/theme_ndara.php
+          **/theme/ndara/README.md

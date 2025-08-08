@@ -1,4 +1,4 @@
-name: Deploy to Live Server (FTP)
+name: Deploy Essential Files (FTP)
 
 on:
   push:
@@ -8,12 +8,49 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       
-    - name: Deploy to FTP
+    - name: Create essential files directory
+      run: |
+        mkdir -p essential-files
+        # Copy only essential files
+        cp -r theme/ essential-files/
+        cp index.php essential-files/
+        cp version.php essential-files/
+        cp composer.json essential-files/
+        cp composer.lock essential-files/
+        cp package.json essential-files/
+        cp npm-shrinkwrap.json essential-files/
+        cp .gitattributes essential-files/
+        cp .nvmrc essential-files/
+        cp .eslintrc essential-files/
+        cp .gherkin-lintrc essential-files/
+        cp .jshintignore essential-files/
+        cp .jshintrc essential-files/
+        cp .shifter.json essential-files/
+        cp .stylelintrc essential-files/
+        cp Gruntfile.js essential-files/
+        cp phpcs.xml.dist essential-files/
+        cp phpunit.xml.dist essential-files/
+        cp behat.yml.dist essential-files/
+        cp CONTRIBUTING.md essential-files/
+        cp COPYING.txt essential-files/
+        cp INSTALL.txt essential-files/
+        cp TRADEMARK.txt essential-files/
+        cp UPGRADING.md essential-files/
+        cp security.txt essential-files/
+        
+        # Copy essential PHP files
+        cp *.php essential-files/ 2>/dev/null || true
+        
+        echo "Essential files prepared for deployment"
+        ls -la essential-files/
+      
+    - name: Deploy Essential Files to FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
         server: ${{ secrets.FTP_SERVER }}
@@ -21,27 +58,6 @@ jobs:
         password: ${{ secrets.FTP_PASSWORD }}
         server-dir: /public_html/learn/
         dangerous-clean-slate: false
-        timeout: 600000
+        timeout: 300000
         max-retries: 3
-        exclude: |
-          **/.git*
-          **/.git*/**
-          **/node_modules/**
-          **/.github/**
-          **/config.php
-          **/moodledata/**
-          **/*.log
-          **/*.sql
-          **/*.sqlite
-          **/temp/**
-          **/cache/**
-          **/vendor/**
-          **/.DS_Store
-          **/*.tmp
-          **/*.bak
-          **/deploy.config*
-          **/DEPLOYMENT.md
-          **/scripts/**
-          **/custom-configs/**
-          **/user-uploads/**
-          **/local-modifications/** 
+        local-dir: ./essential-files/
